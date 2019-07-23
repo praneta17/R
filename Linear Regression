@@ -1,0 +1,76 @@
+#Linear Regression
+
+df = read.csv('C:/personal/R-Course-HTML-Notes/R-Course-HTML-Notes/R-for-Data-Science-and-Machine-Learning/Machine Learning with R/student-mat.csv', sep=';')
+head(df)
+
+any(is.na(df))
+str(df)
+library(ggplot2)
+library(ggthemes)
+library(dplyr)
+#num only
+
+num.cols = sapply(df, is.numeric)
+num.cols
+cor.data = cor(df[,num.cols])
+head(cor.data)                  
+
+library(corrgram)
+library(corrplot)
+
+corrplot(cor.data, method = 'color')
+corrgram(df)
+help(corrgram)
+
+ggplot(df, aes(x=G3)) + geom_histogram(alpha=0.5, fill ='blue', bins= 20)
+
+#Split data to train and test set
+
+library(caTools)
+
+df = read.csv('C:/personal/R-Course-HTML-Notes/R-Course-HTML-Notes/R-for-Data-Science-and-Machine-Learning/Machine Learning with R/student-mat.csv', sep=';')
+head(df)
+
+#set a seed
+set.seed(101)
+#split into train test
+sample = sample.split(df$G3, SplitRatio = 0.7)
+#train set - 70% data
+train = subset(df, sample == TRUE)
+#test set - 30% data
+test = subset(df, sample = FALSE)
+
+#train and build model
+model = lm(G3~., train)
+
+#predict
+G3.predict = predict(model, test)
+results = cbind(G3.predict, test$G3)
+colnames(results) = c('predicted','actual')
+results = as.data.frame(results)
+head(results)
+
+#removing negative numbers
+neg_zero = function (x){
+  if (x<0){
+    return(0)
+  }
+  else {
+    return (x)
+  }
+}
+
+#apply function
+results$predicted = sapply(results$predicted, neg_zero)
+print(head(results))
+
+
+#interpret the model
+print(summary(model))
+
+res = residuals(model)
+res = as.data.frame(res)
+res
+head(res)
+print(ggplot(res, aes(res)) + geom_histogram(fill ='blue'))
+plot(model)
