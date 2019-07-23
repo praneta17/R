@@ -1,0 +1,52 @@
+#k nearest neighbour
+install.packages('ISLR')
+library(ISLR)
+str(Caravan)
+
+#standardize the columns
+var(Caravan[,1])
+var(Caravan[,2])
+
+purchase = Caravan[,86]
+standardized.Caravan = scale(Caravan[,-86])
+head(Caravan)
+
+var(standardized.Caravan[,1])
+var(standardized.Caravan[,2])
+
+#split train test
+test.index = 1:1000
+test.data = standardized.Caravan[test.index,]
+test.purchase = purchase[test.index]
+
+train.data = standardized.Caravan[-test.index,]
+train.purchase = purchase[-test.index]
+
+##knn model
+
+library(class)
+set.seed(101)
+predicted.purchase = knn(train.data, test.data, train.purchase, k=1)
+print(head(predicted.purchase))
+
+misclass.error = mean(test.purchase != predicted.purchase)
+print(misclass.error)
+
+predicted.purchase = NULL
+error.rate = NULL
+
+for(i in 1:20){
+  set.seed(101)
+  predicted.purchase = knn(train.data, test.data, train.purchase, k=i)
+  error.rate[i] = mean(test.purchase != predicted.purchase)
+}
+
+print(error.rate*100)
+print(min(error.rate*100))
+
+#visualize knn method
+k.values = 1:20
+error.df = data.frame(k.values, error.rate)
+head(error.df)
+
+ggplot(error.df, aes(k.values, error.rate)) + geom_point() +geom_line(lty ='dotted', color ='red')
