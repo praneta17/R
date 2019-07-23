@@ -1,0 +1,73 @@
+
+#Logistic Regression
+
+df.train = read.csv('C:/personal/R-Course-HTML-Notes/R-Course-HTML-Notes/R-for-Data-Science-and-Machine-Learning/Machine Learning with R/titanic_train.csv')
+head(df.train)
+str(df.train)
+
+missmap(df.train, col = c('yellow','black'))
+
+library(ggplot2)
+ggplot(df.train, aes(Survived)) + geom_bar()
+
+ggplot(df.train, aes(Pclass)) + geom_bar(aes(fill=factor(Pclass)))
+
+ggplot(df.train, aes(Sex)) + geom_bar(aes(fill=factor(Sex)))
+
+ggplot(df.train, aes(Age)) + geom_histogram(bins = 20, alpha = 0.5, fill = 'blue')
+
+ggplot(df.train, aes(SibSp)) + geom_bar()
+
+ggplot(df.train, aes(Fare)) + geom_histogram()
+
+impute_age <- function(age,class){
+  out <- age
+  for (i in 1:length(age)){
+    
+    if (is.na(age[i])){
+      
+      if (class[i] == 1){
+        out[i] <- 37
+        
+      }else if (class[i] == 2){
+        out[i] <- 29
+        
+      }else{
+        out[i] <- 24
+      }
+    }else{
+      out[i]<-age[i]
+    }
+  }
+  return(out)
+}
+
+fixed.ages <- impute_age(df.train$Age,df.train$Pclass)
+
+df.train$Age = fixed.ages
+
+missmap(df.train, col = c('yellow', 'black'))
+library(dplyr)
+df.train= select(df.train, -PassengerId, -Name, -Ticket, -Cabin)
+head(df.train)
+str(df.train)
+df.train$Survived = factor(df.train$Survived)
+df.train$Pclass = factor(df.train$Pclass)
+df.train$SibSp = factor(df.train$SibSp)
+df.train$Parch = factor(df.train$Parch)
+
+log.model = glm(Survived ~ . , family = binomial(link = 'logit'), data = df.train)
+summary(log.model)
+
+library(caTools)
+set.seed(101)
+split = sample.split(df.train$Survived, SplitRatio = 0.7)
+final.train = subset(df.train, split == TRUE)
+final.test = subset(df.train, split ==FALSE)
+final.log.model = glm(Survived~., family = binomial(link = 'logit'), data = final.train)
+summary(final.log.model)
+
+fitted.probabilities = predict(final.log.model, final.test, type = 'response')
+fitted.results = ifelse(fitted.probabilities>0.5,1,0)
+misClassError = mean(fitted.results != final.test$Survived)
+print(1 - misClassError)
