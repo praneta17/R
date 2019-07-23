@@ -1,0 +1,120 @@
+#Histogram
+#data and aesthetics
+p = ggplot(movies, aes(x=rating))
+
+#geometry
+p2 = p + geom_histogram(binwidth = 0.1, color='red', fill='pink', alpha=0)
+
+p3 = p2 + xlab('Ratings') + ylab('Count') +ggtitle('My tiltle')
+print (p3)
+
+
+#Scatter plot
+
+p = ggplot(mtcars, aes(x = wt, y=mpg))
+
+p2 = p + geom_point(aes(shape=factor(cyl), color = factor(cyl)), size = 5)
+
+print(p2)
+
+#bar plot
+
+p = ggplot(mpg, aes(x = class))
+p2 = p + geom_bar(aes(fill = drv), position ="fill")
+print(p2)
+
+#box plot
+
+p = ggplot(mtcars, aes(x=factor(cyl), y = mpg))
+p2 = p + geom_boxplot(aes(fill=factor(cyl)))
+print(p2)
+
+#variable plotting
+
+p = ggplot(movies, aes(x = year, y= rating))
+p2 = p + geom_bin2d() 
+p3 = p2 + scale_fill_gradient(high='red', low='green')
+print(p3)
+
+install.packages('hexbin')
+library(hexbin)
+p = ggplot(movies, aes(x = year, y= rating))
+p2 = p + geom_hex()
+p3 = p2 + scale_fill_gradient(high='red', low='blue')
+print(p3) 
+
+#coordinates 
+
+p = ggplot(mpg, aes(x = displ, y = hwy))
+p2 = p + geom_point()
+p3 = p2 + coord_cartesian(xlim = c(1,4), ylim = c(15,30))
+print(p3)
+
+#faceting
+
+p = ggplot(mpg, aes(x = displ, y = hwy))
+p2 = p + geom_point()
+p3 = p2 + facet_grid(.~cyl)
+p4 = p2 + facet_grid(drv~.)
+p5 = p2 + facet_grid(drv~cyl)
+print(p3)
+print(p4)
+print(p5)
+
+#theme
+
+theme_set(theme_bw())
+p = ggplot(mtcars, aes(x = wt, y = mpg)) + geom_point()
+print(p +theme_economist())
+
+#exercises
+
+theme_set(theme_base())
+p = ggplot(mpg, aes(x = hwy))
+p2 = p + geom_histogram(bins=20,fill = 'orange')
+print (p2)
+
+p = ggplot(mpg, aes(x = manufacturer))
+p2 = p +geom_bar(aes(fill = factor(cyl))) +theme_gdocs()
+print(p2)
+
+p = ggplot(txhousing, aes(x = sales, y = volume))
+p2 = p + geom_point(color = 'blue', alpha =0.5)
+print(p2)
+
+p = ggplot(txhousing, aes(x = sales, y=volume))
+p2 = p +geom_plot()
+p3 = p2 + geom_smooth(color = 'red')
+print(p3)
+
+#Assignment
+
+head(df)
+p = ggplot(df, aes(x=CPI, y = HDI))
+p2 = p + geom_point(aes(color = Region,size = 5), shape=1)
+p3 = p2 + geom_smooth(aes(group=1), method = lm, formula = y ~ log(x), se=FALSE, color='red')
+p4 = p3 + geom_text(aes(label=Country))
+print(p4)
+
+#Plotly
+
+p1 = ggplot(mtcars, aes(wt)) + geom_histogram()
+print(p1)
+
+p2 = ggplotly(p1)
+print(p2)
+
+#capstone project
+
+batting = read.csv('C:/personal/R-Course-HTML-Notes/R-Course-HTML-Notes/R-for-Data-Science-and-Machine-Learning/Training Exercises/Capstone and Data Viz Projects/Capstone Project/Batting.csv')
+batting$BA = batting$H / batting$AB
+head(batting)
+head(batting$AB)
+head(batting$X2B)
+tail(batting$BA,5)
+batting$OBP = ((batting$H + batting$BB + batting$HBP) / (batting$AB + batting$BB + batting$HBP +batting$SF))
+head(batting$OBP)
+
+
+sal = read.csv('C:/personal/R-Course-HTML-Notes/R-Course-HTML-Notes/R-for-Data-Science-and-Machine-Learning/Training Exercises/Capstone and Data Viz Projects/Capstone Project/Salaries.csv')
+head(sal)
