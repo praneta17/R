@@ -1,0 +1,27 @@
+#random forest project
+
+head(College)
+
+ggplot(College, aes(Room.Board, Grad.Rate)) + geom_point(aes(color = Private))
+
+ggplot(College, aes(F.Undergrad)) + geom_histogram(aes(fill =Private), color ='black',bins = 50)
+
+ggplot(College, aes(Grad.Rate)) + geom_histogram(aes(fill =Private), color ='black',bins = 50)
+
+subset(College, Grad.Rate >100)
+
+df = as.data.frame(College)
+
+df['Cazenovia College','Grad.Rate'] = 100
+
+set.seed(101)
+sample = sample.split(df$Private, SplitRatio = 0.07)
+train = subset(df, sample ==TRUE)
+test = subset(df, sample== FALSE)
+
+tree = rpart(Private ~., data=train, method='class')
+print(tree)
+
+predict = predict(tree, test)
+print(predict)
+head(predict)
