@@ -1,0 +1,47 @@
+#project Linear Regression
+
+bike= read.csv('C:/personal/R-Course-HTML-Notes/R-Course-HTML-Notes/R-for-Data-Science-and-Machine-Learning/Training Exercises/Machine Learning Projects/CSV files for ML Projects/bikeshare.csv')
+bike = as.data.frame(bike)
+head(bike)
+
+library(ggplot2)
+p1 = ggplot(bike, aes(temp, count))
+p2 = p1 + geom_point(aes(color = temp), alpha = 0.2) + theme_bw()
+print(p2)
+
+bike$datetime = as.POSIXct(bike$datetime)
+p1 = ggplot(bike, aes(datetime, count))
+p2 = p1 + geom_point(aes(color=temp)) + scale_color_continuous(low='#55D8CE',high='#FF6E2E')
+print(p2)
+
+cor = cor(bike[,c('temp', 'count')])
+cor
+
+p1 = ggplot(bike, aes(factor(season), count))
+p2 = p1 + geom_boxplot(aes(color = factor(season)))
+print (p2)
+
+
+timestamp = bike$datetime
+head(timestamp)
+bike$hour = format(timestamp,"%H")
+head(bike)
+
+
+bike2 = filter(bike, workingday==1)
+head(bike2)
+p1 = ggplot(bike, aes(hour, count))
+p2 = p1 + geom_point(aes(color=temp))
+print(p2)
+
+
+temp.model = lm(count ~ temp, bike)
+summary(temp.model)
+
+
+predicted = predict (temp.model, bike)
+results = cbind(predicted, bike$count, bike$temp)
+colnames(results) = c('predicted', 'actual', 'temp')
+results= as.data.frame(results)
+head(results)
+head(results)
