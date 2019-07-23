@@ -1,0 +1,45 @@
+#knn project
+
+library(ISLR)
+head(iris)
+
+standardized.iris = scale(iris[1:4])
+
+var(standardized.iris[,1])
+var(standardized.iris[,2])
+
+final.data = cbind(standardized.iris, iris[5])
+
+head(final.data)
+
+set.seed(101)
+
+sample = sample.split(final.data$Species , SplitRatio = 0.70)
+train.data = subset(final.data, sample == TRUE)
+test.data = subset(final.data, sample ==FALSE)
+
+library(class)
+
+predicted.species = knn(train.data[1:4], test.data[1:4], train.data$Species, k=1)
+
+predicted.species
+
+mean(test.data$Species != predicted.species)
+
+error = NULL
+
+for (i in 1:10){
+  set.seed(101)
+  predicted.species = knn(train.data[1:4], test.data[1:4], train.data$Species, k=i)
+  error[i] = mean(test.data$Species != predicted.species)
+}
+
+print (error)
+
+k = 1:10
+print (k)
+
+combined = data.frame(error, k)
+print (combined)
+
+ggplot(combined, aes(x=k,y=error)) + geom_point() + geom_line(lty="dotted", color = 'red')
