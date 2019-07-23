@@ -1,0 +1,142 @@
+#logistic regression project
+
+
+adult = read.csv('C:/personal/R-Course-HTML-Notes/R-Course-HTML-Notes/R-for-Data-Science-and-Machine-Learning/Training Exercises/Machine Learning Projects/CSV files for ML Projects/adult_sal.csv')
+head(adult)
+
+library(dplyr)
+adult <- select(adult,-X)
+
+head(adult)
+str(adult)
+summary(adult)
+
+table(adult$type_employer)
+
+unemp = function(job){
+  job = as.character(job)
+  if(job =='Without-pay' | job =='Never-worked'){
+    return('Unemployed')
+  }
+  else{
+    return (job)
+  }
+}
+adult$type_employer = sapply(adult$type_employer, unemp)
+
+gov = function(job){
+  job = as.character(job)
+  if (job == 'State-gov'| job =='Local-gov'){
+    return ('SL-gov')
+  }
+  if(job =='Self-emp-inc' | job =='Self-emp-not-inc'){
+    return ('Self-emp')
+  }
+  else{
+    return (job)
+  }
+}
+adult$type_employer = sapply(adult$type_employer, gov)
+table(adult$type_employer)
+
+table(adult$marital)
+
+married = function(status){
+  status = as.character(status)
+    if (status=='Married-AF-spouse' | status =='Married-civ-spouse' | status =='Married-spouse-absent'){
+      return('Married')
+    }
+    if(status =='Divorced' | status =='Separated' | status =='Widowed'){
+      return ('Not-Married')
+    }
+    else{
+      return ('Never-Married')
+    }
+}
+adult$marital = sapply(adult$marital, married)
+table(adult$marital)
+
+table(adult$country)
+Asia <- c('China','Hong','India','Iran','Cambodia','Japan', 'Laos' ,
+          'Philippines' ,'Vietnam' ,'Taiwan', 'Thailand')
+
+North.America <- c('Canada','United-States','Puerto-Rico' )
+
+Europe <- c('England' ,'France', 'Germany' ,'Greece','Holand-Netherlands','Hungary',
+            'Ireland','Italy','Poland','Portugal','Scotland','Yugoslavia')
+
+Latin.and.South.America <- c('Columbia','Cuba','Dominican-Republic','Ecuador',
+                             'El-Salvador','Guatemala','Haiti','Honduras',
+                             'Mexico','Nicaragua','Outlying-US(Guam-USVI-etc)','Peru',
+                             'Jamaica','Trinadad&Tobago')
+Other <- c('South')
+group_country <- function(ctry){
+  if (ctry %in% Asia){
+    return('Asia')
+  }else if (ctry %in% North.America){
+    return('North.America')
+  }else if (ctry %in% Europe){
+    return('Europe')
+  }else if (ctry %in% Latin.and.South.America){
+    return('Latin.and.South.America')
+  }else{
+    return('Other')      
+  }
+}
+adult$country <- sapply(adult$country,group_country)
+table(adult$country)
+
+str(adult)
+
+adult$type_employer <- sapply(adult$type_employer,factor)
+adult$country <- sapply(adult$country,factor)
+adult$marital <- sapply(adult$marital,factor)
+
+library(Amelia)
+
+adult[adult == '?'] = NA
+table(adult$type_employer)
+
+missmap(adult, col = c('yellow', 'black'))
+missmap(adult,y.at=c(1),y.labels = c(''),col=c('yellow','black'))
+
+missmap(adult,col=c('yellow','black'))
+
+str(adult)
+
+p1 = ggplot(adult, aes(age))
+p2 = p1 + geom_histogram(aes(fill=income),color='black',binwidth=1) + theme_bw()
+print (p2)
+
+head(adult)
+
+ggplot(adult, aes(hr_per_week)) + geom_histogram()
+
+names(adult)[names(adult) == 'country']= 'region'
+str(adult)             
+
+ggplot(adult, aes(region)) + geom_bar(aes(fill = factor(income)) , color = 'black') + theme_bw()
+
+head(adult)
+
+library(caTools)
+set.seed(101)
+split = sample.split(adult$income, SplitRatio = 0.7)
+final_train =  subset(adult, split == TRUE)
+final_test = subset(adult, split ==FALSE)
+
+head(final_test)
+head(final_train)
+
+help(glm)
+
+model = glm(income ~., data = final_train, family = binomial('logit'))     
+summary(model)
+
+help(step)
+
+new.model = step(model)
+summary(new.model)
+
+final_test$predicted.income = predict(model, newdata = final_test, type = 'response')
+table(final_test$income, final_test$predicted.income > 0.5)
